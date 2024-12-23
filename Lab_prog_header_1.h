@@ -1,4 +1,4 @@
-//Lab_prog_1.h
+// Prog_1_header.h
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
@@ -60,7 +60,7 @@ bool isValidDate(const char* dateStr) {
     }
     if (month == 2) {
         int daysInFeb = 28 + (is_leap(year) ? 1 : 0);
-        if (day > daysInFeb) {
+        if (day > 28 + (is_leap(year) ? 1 : 0)) {
             return false;
         }
     }
@@ -99,13 +99,14 @@ void outgoing_correspondence() {
             printf("\n");
             tabul(11); printf("ÂÂÅÄÈÒÅ ÈÌß ÔÀÉËÀ: ");
             string fileNameInput;
-            cin >> fileNameInput;
-            if (!isValidFileName(fileNameInput)) {
+            scanf("%255[^\n]", txt_name);
+            getchar(); // î÷èùàåì áóôåð
+            if (!isValidFileName(txt_name)) {
                 tabul(11); printf("Íåäîïóñòèìûå ñèìâîëû â èìåíè ôàéëà. Ïîæàëóéñòà, èñïîëüçóéòå äðóãîå èìÿ.\n");
                 printf("ÄËß ÏÐÎÄÎËÆÅÍÈß ÍÀÆÌÈÒÅ ENTER."); system("PAUSE>nul");
                 break;
             }
-            strcpy(txt_name, fileNameInput.c_str());
+
 
             sprintf(full_name, "%s%s%s%s", folder_way, ocfe, txt_name, file_extension);
             file = fopen(full_name, "w");
@@ -146,10 +147,21 @@ void outgoing_correspondence() {
             }
             if (sel != '1' && sel != '2') { break; }
             system("cls");
-            printf("ÔÀÉË ÎÒÊÐÛÒ.\n");
-
+            printf("ÔÀÉË ÎÒÊÐÛÒ.\n\n");
+            printf("Íàæìèòå TAB äëÿ ïåðåõîäà ê ñëåäóþùåìó ïàðàìåòðó.\n");
+            printf("Íàæìèòå Enter äëÿ ìîìåíòàëüíîãî ïåðåõîäà ê ñëåäóþùåé çàïèñè.\n");
+            printf("Îáðàòèòå âíèìàíèå ÷òî ïðè íàæàòèè TAB ïðè îòñóòñâèè ââîäà ïðîãðàììà òàê æå ïåðåéäåò ê ñëåäóþùåìó ïàðàìåòðó!\n");
             while (1) {
-                printf(" %s: ", (current_col == 0) ? "ÒÈÏ ÊÎÐÐÅÑÏÎÍÄÅÍÖÈÈ" : (current_col == 1) ? "ÄÀÒÀ (ÄÄ.ÌÌ.ÃÃÃÃ)" : "ÍÀÇÂÀÍÈÅ ÎÐÃÀÍÈÇÀÖÈÈ");
+
+                if (current_col == 0) {
+                    printf("\nÒÈÏ ÊÎÐÐÅÑÏÎÍÄÅÍÖÈÈ: ");
+                }
+                else if (current_col == 1) {
+                    printf("\nÄÀÒÀ (ÄÄ.ÌÌ.ÃÃÃÃ): ");
+                }
+                else if (current_col == 2) {
+                    printf("\nÍÀÇÂÀÍÈÅ ÎÐÃÀÍÈÇÀÖÈÈ: ");
+                }
                 i = 0;
                 while (1) {
                     char c = _getch();
@@ -159,8 +171,8 @@ void outgoing_correspondence() {
                     }
                     else if (c == '\t') {
                         text[current_col][i] = '\0';
-
-                        if (current_col == 1 && !isValidDate(text[1])) {
+                        
+                        if (current_col == 1 && !isValidDate(text[1]) && text[1][0] != '\0') {
                             printf("\nÍåâåðíûé ôîðìàò äàòû. Ïîæàëóéñòà, ââåäèòå äàòó â ôîðìàòå ÄÄ.ÌÌ.ÃÃÃÃ\n");
                             memset(text[current_col], 0, sizeof(text[current_col]));
                             i = 0;
@@ -179,8 +191,6 @@ void outgoing_correspondence() {
                             current_col = 0;
                             memset(text, 0, sizeof(text));
                             printf("\n");
-
-
                             break;
                         }
                         break;
@@ -267,14 +277,14 @@ void organization_addresses() {
         case '1': {
             printf("\n");
             tabul(11); printf("ÂÂÅÄÈÒÅ ÈÌß ÔÀÉËÀ: ");
-            string fileNameInput;
-            cin >> fileNameInput;
-            if (!isValidFileName(fileNameInput)) {
+
+            scanf("%255[^\n]", txt_name);
+            getchar();
+            if (!isValidFileName(txt_name)) {
                 tabul(11); printf("Íåäîïóñòèìûå ñèìâîëû â èìåíè ôàéëà. Ïîæàëóéñòà, èñïîëüçóéòå äðóãîå èìÿ.\n");
                 printf("ÄËß ÏÐÎÄÎËÆÅÍÈß ÍÀÆÌÈÒÅ ENTER."); system("PAUSE>nul");
-                break;  // Âûõîäèì èç case '1'
+                break;
             }
-            strcpy(txt_name, fileNameInput.c_str());
 
 
             sprintf(full_name, "%s%s%s%s", folder_way, oa, txt_name, file_extension);
@@ -316,9 +326,21 @@ void organization_addresses() {
             }
             if (sel != '1' && sel != '2') { break; }
             system("cls");
-            printf("ÔÀÉË ÎÒÊÐÛÒ.\n");
+            printf("ÔÀÉË ÎÒÊÐÛÒ.\n\n");
+            printf("Íàæìèòå TAB äëÿ ïåðåõîäà ê ñëåäóþùåìó ïàðàìåòðó.\n");
+            printf("Íàæìèòå Enter äëÿ ìîìåíòàëüíîãî ïåðåõîäà ê ñëåäóþùåé çàïèñè.\n");
+            printf("Îáðàòèòå âíèìàíèå ÷òî ïðè íàæàòèè TAB ïðè îòñóòñâèè ââîäà ïðîãðàììà òàê æå ïåðåéäåò ê ñëåäóþùåìó ïàðàìåòðó!\n");
             while (1) {
-                printf(" %s: ", (current_col == 0) ? "ÍÀÇÂÀÍÈÅ ÎÐÃÀÍÈÇÀÖÈÈ" : (current_col == 1) ? "ÀÄÐÅÑ" : "ÔÈÎ ÎÐÃÀÍÈÇÀÒÎÐÀ");
+
+                if (current_col == 0) {
+                    printf("\nÍÀÇÂÀÍÈÅ ÎÐÃÀÍÈÇÀÖÈÈ: ");
+                }
+                else if (current_col == 1) {
+                    printf("\nÀÄÐÅÑ: ");
+                }
+                else if (current_col == 2) {
+                    printf("\nÔÈÎ ÎÐÃÀÍÈÇÀÒÎÐÀ: ");
+                }
                 i = 0;
                 while (1) {
                     char c = _getch();
@@ -365,7 +387,7 @@ void organization_addresses() {
                     }
                     else {
 
-                        if (current_col == 2) {
+                        if (current_col == 2) { //Ïðîâåðêà ÔÈÎ
                             bool valid_char = false;
                             if ((c >= 'à' && c <= 'ÿ') || (c >= 'À' && c <= 'ß') ||
                                 (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
@@ -406,19 +428,17 @@ void menu_choises() {
         tabul(11); printf("Esc) ÂÛÕÎÄ Â ÌÅÍÞ\n\n");
         tabul(11); printf("_____________________________________________\n\n");
         tabul(11); printf("ÂÛÁÐÀÍÍÛÉ ÏÓÒÜ Ê ÏÀÏÊÅ: %s\n", folder_way);
-        tabul(11); printf("> ");
+        tabul(11);
         menu_out = _getch();
         switch (menu_out) {
         case '1':
-            if (folder_way != NULL) {
+            if (folder_way[0] != '\0') {
                 outgoing_correspondence();
-
                 break;
             }
         case '2':
-            if (folder_way != NULL) {
+            if (folder_way[0] != '\0') {
                 organization_addresses();
-
                 break;
             }
         }
@@ -429,22 +449,27 @@ void program_way() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     printf("\n");
-    tabul(11); printf("ÂÂÅÄÈÒÅ ÏÓÒÜ Ê ÏÀÏÊÅ: ");
-    scanf("%255s", folder_way);
+    char folder_way_new[256] = { 0 };
 
-    size_t len = strlen(folder_way);
-    if (len > 0 && folder_way[len - 1] != '\\') {
-        folder_way[len] = '\\';
-        folder_way[len + 1] = '\0';
+    tabul(11); printf("ÂÂÅÄÈÒÅ ÏÓÒÜ Ê ÏÀÏÊÅ: ");
+    scanf("%255[^\n]", folder_way_new);
+    getchar();
+
+
+    size_t len = strlen(folder_way_new);
+    if (len > 0 && folder_way_new[len - 1] != '\\') {
+        folder_way_new[len] = '\\';
+        folder_way_new[len + 1] = '\0';
     }
 
     struct stat program_way_buffer;
-    if (stat(folder_way, &program_way_buffer) == 0) {
+    if (stat(folder_way_new, &program_way_buffer) == 0) {
         tabul(11); printf("ÏÓÒÜ Ê ÏÀÏÊÅ ÂÛÁÐÀÍ. ");
+        strcpy(folder_way, folder_way_new); // Êîïèðóåì íîâûé ïóòü â ãëîáàëüíóþ ïåðåìåííóþ
     }
     else {
         tabul(11); printf("1Õ1: ÎØÈÁÊÀ ÂÂÎÄÀ. ÍÅÂÅÐÍÛÉ ÏÓÒÜ Ê ÏÀÏÊÅ. ");
-        memset(folder_way, 0, sizeof(folder_way));
+        memset(folder_way_new, 0, sizeof(folder_way_new));
     }
     printf("ÄËß ÏÐÎÄÎËÆÅÍÈß ÍÀÆÌÈÒÅ ENTER."); system("PAUSE>nul");
 }
@@ -462,7 +487,7 @@ void menu() {
         tabul(11); printf("Esc) ÂÛÕÎÄ ÈÇ ÏÐÎÃÐÀÌÌÛ\n\n");
         tabul(11); printf("_____________________________________________\n\n");
         tabul(11); printf("ÂÛÁÐÀÍÍÛÉ ÏÓÒÜ Ê ÏÀÏÊÅ: %s\n", folder_way);
-        tabul(11); printf("> ");
+        tabul(11);
 
         menu_out = _getch();
         switch (menu_out) {
@@ -470,7 +495,6 @@ void menu() {
             if (folder_way[0] != '\0')
             {
                 menu_choises();
-                menu();
                 break;
             }
             else
@@ -478,7 +502,6 @@ void menu() {
                 printf("Ñíà÷àëà âûáåðèòå ïóòü ê ïàïêå. ");
                 printf("ÄËß ÏÐÎÄÎËÆÅÍÈß ÍÀÆÌÈÒÅ ENTER.");
                 system("PAUSE>nul");
-                menu();
                 break;
             }
 
