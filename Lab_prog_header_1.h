@@ -9,9 +9,8 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <locale>
-#include <string> // Для std::string
-#include <algorithm> // Для std::replace
-#include "Instruction.h"
+#include <string>
+#include <algorithm> // Для replace
 
 
 #define MAX_LENGTH 1000
@@ -77,6 +76,29 @@ bool isValidFileName(const std::string& fileName) {
     // Запрещенные символы в Windows
     const std::string invalidChars = "\\/:*?\"<>|";
     return fileName.find_first_of(invalidChars) == std::string::npos;
+}
+
+void instruction() {
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    system("cls");
+    std::ifstream file("Instruction.txt");
+    if (file.is_open()) {
+        std::string line;
+        while (getline(file, line)) {
+            std::cout << line << std::endl;
+        }
+        file.close();
+    }
+    else
+    {
+        std::cout << "Не удалось открыть файл instruction.txt" << std::endl;
+    }
+
+
+
+    printf("\n> ");
+    system("PAUSE>nul");
 }
 
 void outgoing_correspondence() {

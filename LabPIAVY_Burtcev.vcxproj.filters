@@ -20,9 +20,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Instruction.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Lab_prog_header_1.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
