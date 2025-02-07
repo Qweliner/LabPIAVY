@@ -18,6 +18,14 @@
     <ClCompile Include="Lab_prog.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Lab_prog_header_1.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lab_prog_header_1.h">
@@ -25,8 +33,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include=".gitignore">
+    <Text Include="Instruction.txt">
       <Filter>Файлы ресурсов</Filter>
-    </None>
+    </Text>
   </ItemGroup>
 </Project>

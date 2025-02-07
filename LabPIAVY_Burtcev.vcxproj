@@ -23,9 +23,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lab_prog_header_1.h" />
+    <ClCompile Include="Lab_prog_header_1.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Instruction.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
