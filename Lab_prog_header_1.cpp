@@ -1,4 +1,3 @@
-// Prog_1_header.cpp
 #include "Lab_prog_header_1.h"
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable:4996)
@@ -16,7 +15,6 @@ const char* oa = "AO_"; // Префикс для файлов адресов организаций
 char menu_out; // Выбор пользователя в главном меню
 char menu_out_case; // Выбор пользователя в подменю
 char sel; // Выбор пользователя режима записи
-
 
 // Функция для табуляции
 void tabul(int x) {
@@ -106,6 +104,7 @@ void outgoing_correspondence() {
         tabul(11); printf("_____________________________________________\n\n");
         tabul(11); printf("> ");
         menu_out_case = _getch();
+        if (menu_out_case == 27) { return; } // Возврат в предыдущее меню
         FILE* file{};
         switch (menu_out_case) {
         case '1': {
@@ -186,7 +185,7 @@ void outgoing_correspondence() {
                         text[current_col][i] = '\0';
 
                         if (current_col == 1 && !isValidDate(text[1]) && text[1][0] != '\0') {
-                            printf("\nНеверный формат даты. Пожалуйста, введите дату в формате ДД.ММ.ГГГГ\n");
+                            printf("\nНеверный формат даты. Пожалуйста, введите дату в формате ДД.ММ.ГГГГ: ");
                             memset(text[current_col], 0, sizeof(text[current_col]));
                             i = 0;
                             continue;
@@ -258,12 +257,10 @@ void outgoing_correspondence() {
             }
         exit_outgoing_correspondence:
             if (file) fclose(file);
-            outgoing_correspondence();
-            return;
             break;
         }
         }
-    } while (menu_out_case != 27);
+    } while (true);
 }
 
 // Функция для работы с адресами организаций
@@ -282,6 +279,7 @@ void organization_addresses() {
         tabul(11); printf("_____________________________________________\n\n");
         tabul(11); printf("> ");
         menu_out_case = _getch();
+        if (menu_out_case == 27) { return; } // Возврат в предыдущее меню
         FILE* file{};
         switch (menu_out_case) {
         case '1': {
@@ -415,12 +413,10 @@ void organization_addresses() {
             }
         exit_organization_addresses:
             if (file) fclose(file);
-            organization_addresses();
-            return;
             break;
         }
         }
-    } while (menu_out_case != 27);
+    } while (true);
 }
 
 // Функция для подменю выбора типа данных
@@ -429,15 +425,17 @@ void menu_choises() {
     SetConsoleOutputCP(1251);
     do {
         system("cls");
-        for (int i = 6; i != 0; i--) printf("\n");
+        for (int i = 3; i != 0; i--) printf("\n");
         tabul(11); printf("МЕНЮ ВЫБОРА ТИПА ДАННЫХ\n\n");
         tabul(11); printf("1)   ИСХОДЯЩАЯ КОРРЕСПОНДЕНЦИЯ\n");
         tabul(11); printf("2)   АДРЕСА ОРГАНИЗАЦИЙ\n");
-        tabul(11); printf("Esc) ВЫХОД В МЕНЮ\n\n");
+        tabul(11); printf("Esc) ВЫХОД В МЕНЮ\n");
+        for (int i = 2; i != 0; i--) printf("\n");
         tabul(11); printf("_____________________________________________\n\n");
         tabul(11); printf("ВЫБРАННЫЙ ПУТЬ К ПАПКЕ: %s\n", folder_way);
         tabul(11); printf("> ");
         menu_out = _getch();
+        if (menu_out == 27) { return; } // Возврат в главное меню
         switch (menu_out) {
         case '1':
             if (folder_way[0] != '\0') {
@@ -450,7 +448,7 @@ void menu_choises() {
                 break;
             }
         }
-    } while (menu_out != 27);
+    } while (true);
 }
 
 // Функция для выбора пути к папке
@@ -476,8 +474,10 @@ void program_way() {
         strcpy(folder_way, folder_way_new);
     }
     else {
-        tabul(11); printf("1Х1: ОШИБКА ВВОДА. НЕВЕРНЫЙ ПУТЬ К ПАПКЕ. ");
+        tabul(11); printf("ОШИБКА ВВОДА. НЕВЕРНЫЙ ПУТЬ К ПАПКЕ. ");
         memset(folder_way_new, 0, sizeof(folder_way_new));
+        // Очистка переменной folder_way
+        memset(folder_way, 0, sizeof(folder_way));
     }
     printf("ДЛЯ ПРОДОЛЖЕНИЯ НАЖМИТЕ ENTER."); system("PAUSE>nul");
 }
@@ -519,6 +519,8 @@ void menu() {
         case '3':
             instruction();
             break;
+        case 27: // Выход из программы по нажатию Esc в главном меню
+            return;
         }
-    } while (menu_out != 27);
+    } while (true);
 }
