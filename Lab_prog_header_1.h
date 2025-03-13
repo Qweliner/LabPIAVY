@@ -1,3 +1,4 @@
+//Lab_prog_header_1.h
 #pragma once
 
 #include <iostream>
@@ -9,24 +10,25 @@
 #include <sys/stat.h>
 #include <locale>
 #include <string>
-#include <algorithm> // Для replace
-#include <filesystem> // Добавили
+#include <algorithm>
+#include <filesystem>
 
-// Глобальные переменные (оставлены только необходимые, аналогичные второй программе)
-extern char folder_way[256];       // Путь к папке
-extern const char* file_extension; // Расширение файла
-extern const char* ocfe;           // Префикс для файлов исходящей корреспонденции
-extern const char* oa;             // Префикс для файлов адресов организаций
+// Глобальные переменные
+extern char folder_way[256];
+extern const char* file_extension;
+extern const char* ocfe;
+extern const char* oa;
 
 // Объявления функций
-bool is_leap(int year);                                 // Функция для проверки високосного года
-bool isValidDate(const char* dateStr);                  // Функция для проверки корректности даты
-bool isValidFileName(const std::string& fileName);      // Функция для проверки корректности имени файла
-void instruction();                                     // Функция для отображения инструкции
-void outgoing_correspondence();                         // Функция для работы с исходящей корреспонденцией
-void organization_addresses();                           // Функция для работы с адресами организаций
-void menu_choises();                                    // Функция для подменю выбора типа данных
-void program_way();                                     // Функция для выбора пути к папке
-void menu();                                            // Главная функция меню
-std::string getLineWithEsc(const std::string& instruction); //Функция ввода с обработкой Esc
+bool is_leap(int year);
+bool isValidDate(const char* dateStr);
+bool isValidFileName(const std::string& fileName);
+void instruction();
+void outgoing_correspondence();
+void organization_addresses();
+void menu_choises();
+void program_way();
+void menu();
+std::string getLineWithEsc(const std::string& instruction);
 std::string normalizePath(const std::string& path);
+void openFileForAppend(FILE*& file, const char* full_name, const char* headers, std::string& mode);

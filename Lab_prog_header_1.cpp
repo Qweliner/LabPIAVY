@@ -51,6 +51,9 @@ bool is_leap(int year) {
 
 /** @brief Проверяет корректность даты. */
 bool isValidDate(const char* dateStr) {
+    if (strcmp(dateStr, "нет данных") == 0) {
+        return true;
+    }
     if (strlen(dateStr) != 10) {
         return false;
     }
@@ -81,7 +84,6 @@ bool isValidDate(const char* dateStr) {
 
     return true;
 }
-
 /** @brief Проверяет корректность имени файла. */
 bool isValidFileName(const std::string& fileName) {
     // Запрещенные символы в Windows
@@ -107,7 +109,7 @@ void instruction() {
     {
         std::cout << "Не удалось открыть файл instruction.txt" << std::endl;
         // Добавляем информацию о пути к файлу инструкции
-        std::cerr << "Пожалуйста, поместите файл instructions.txt в следующую папку:\n";
+        std::cerr << "Пожалуйста, поместите файл instruction.txt в следующую папку:\n";
         std::cerr << std::filesystem::current_path().string() << std::endl;
 
     }
@@ -116,65 +118,8 @@ void instruction() {
     system("mode con cols=120 lines=30");
 }
 
-// Новая функция для проверки и запроса "нет данных"
-bool checkAndRequestEmpty(char field[], int& i, int current_col, const char* headers) {
-    field[i] = '\0'; // Завершаем строку текущего поля
-
-    // Сразу проверяем, пустое ли поле
-    if (i == 0) {
-        printf("\nВы оставили поле пустым, добавить 'нет данных'?(y/n): ");
-        while (true)
-        {
-            char confirm = _getch();
-            if (tolower(confirm) == 'y') {
-                strcpy(field, "нет данных");
-                return true; // "нет данных" добавлено
-            }
-            else if (tolower(confirm) == 'n') {
-                // Раньше здесь был выход.  Теперь - возврат к вводу.
-                printf("\nПовторите ввод.\n"); // Сообщение
-                memset(field, 0, sizeof(field));  // Очищаем поле
-                i = 0; // Сбрасываем индекс
-                return false;  //  НЕ выходим, а продолжаем ввод
-            }
-        }
-    }
-    // Проверка на неверный ввод для даты.
-    if (current_col == 1 && strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
-        if (!isValidDate(field)) {  //  Проверка даты
-            printf("\nНеверный формат даты. Пожалуйста, введите дату в формате ДД.ММ.ГГГГ.\nПовторите ввод.\n");
-            memset(field, 0, sizeof(field));
-            i = 0;
-            return false;
-        }
-    }
-
-    // Проверка на неверный ввод для ФИО.
-    if (current_col == 2 && strcmp(headers, "Название организации | Адрес | ФИО организатора\n") == 0) {
-        if (strlen(field) > 0) { //  Проверка ФИО
-            for (int j = 0; j < strlen(field); ++j) {
-                bool valid_char = false;
-                if ((field[j] >= 'а' && field[j] <= 'я') || (field[j] >= 'А' && field[j] <= 'Я') ||
-                    (field[j] >= 'a' && field[j] <= 'z') || (field[j] >= 'A' && field[j] <= 'Z') ||
-                    field[j] == ' ' || field[j] == '-' || field[j] == '\x2D') {
-                    valid_char = true;
-                }
-                if (!valid_char) {
-                    printf("\nНекорректный ввод ФИО. Введите еще раз: \n");
-                    memset(field, 0, sizeof(field));
-                    i = 0;
-                    return false;
-                }
-            }
-        }
-    }
-
-    return true; // Поле не пустое (или корректно заполнено "нет данных")
-}
-
-
 /** @brief Общая функция для открытия файла для дозаписи */
-void openFileForAppend(FILE*& file, const char* full_name, char text[][1000], const char* headers, string& mode) {
+void openFileForAppend(FILE*& file, const char* full_name, const char* headers, std::string& mode) {
     // Определение режима *ДО* открытия файла
     if (std::filesystem::exists(full_name)) {
         mode = "Открытие файла (дозапись)";
@@ -183,7 +128,7 @@ void openFileForAppend(FILE*& file, const char* full_name, char text[][1000], co
         mode = "Создание файла";
     }
 
-    file = fopen(full_name, "a");  //Открываем файл
+    file = fopen(full_name, "a");
     if (!file) {
         printf("Ошибка открытия файла для дозаписи.\n");
         printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
@@ -192,189 +137,136 @@ void openFileForAppend(FILE*& file, const char* full_name, char text[][1000], co
 
     system("cls");
     printf("Файл открыт для дозаписи.\n\n");
-    //cout << "Режим: " << mode << endl; // Убрали вывод режима
     cout << "Путь к файлу: " << full_name << endl << endl;
-
     printf("Нажмите TAB для перехода к следующему параметру.\n");
-    printf("Нажмите Enter для моментального перехода к следующей записи.\n");
-    printf("Обратите внимание что при нажатии TAB при отсутсвии ввода программа так же перейдет к следующему параметру!\n");
+    printf("Нажмите Enter для перехода к следующему параметру.\n");
+    printf("Вы можете ввести 'нет данных' в любое поле.\n"); // Добавлено сообщение
 
+    char field[1000];
     int i = 0;
-    int current_col = 0;
 
-    while (1) {
-        if (current_col == 0) {
-            if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0)
-            {
-                printf("\nТип корреспонденции: ");
-            }
-            else
-            {
-                printf("\nНазвание организации: ");
-            }
-        }
-        else if (current_col == 1) {
-            if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0)
-            {
-                printf("\nДата (ДД.ММ.ГГГГ): ");
-            }
-            else
-            {
-                printf("\nАдрес: ");
-            }
-        }
-        else if (current_col == 2) {
-            if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0)
-            {
-                printf("\nНазвание организации: ");
-            }
-            else
-            {
-                printf("\nФИО организатора: ");
-            }
-        }
+    while (true) { // Добавлен внешний цикл для непрерывной дозаписи
+        for (int current_col = 0; current_col < 3; current_col++) {
+            i = 0;
+            memset(field, 0, sizeof(field));
 
-        i = 0;
-        while (1) {
-            char c = _getch();
-
-            if (c == 27) {
-                if (file) fclose(file);
-                return; // Выход из функции дозаписи
-            }
-            else if (c == '\t') {
-                if (!checkAndRequestEmpty(text[current_col], i, current_col, headers))
-                {
-                    if (i == 0 && c == 27)
-                    {
-                        if (file) fclose(file);
-                        return;
-                    }
-                    //При нажатии на n, просим повторно ввести данные
-                    continue;
-
+            // Вывод приглашения к вводу
+            if (current_col == 0) {
+                if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
+                    printf("\nТип корреспонденции: ");
                 }
+                else {
+                    printf("\nНазвание организации: ");
+                }
+            }
+            else if (current_col == 1) {
+                if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
+                    printf("\nДата (ДД.ММ.ГГГГ): ");
+                }
+                else {
+                    printf("\nАдрес: ");
+                }
+            }
+            else if (current_col == 2) {
+                if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
+                    printf("\nНазвание организации: ");
+                }
+                else {
+                    printf("\nФИО организатора: ");
+                }
+            }
 
-                current_col++;
-                if (current_col == 3) {
-                    // Проверку на ВСЕ пустые поля *убираем* отсюда
-                    fprintf(file, "%s\t%s\t%s\n", text[0], text[1], text[2]); // Запись
-                    current_col = 0;
-                    memset(text, 0, sizeof(text));
-                    printf("\n");
+            // Цикл ввода для одного поля
+            while (true) {
+                char c = _getch();
+
+                if (c == 27) {
+                    if (file) fclose(file);
+                    return;
+                }
+                else if (c == '\t' || c == '\r') {
+                    field[i] = '\0'; // Завершаем строку
+
+                    //  проверка формата даты ПОСЛЕ ввода
+                    if (current_col == 1 && strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
+                        if (!isValidDate(field)) {
+                            printf("\nНеверный формат даты. Пожалуйста, введите дату в формате ДД.ММ.ГГГГ или 'нет данных': \n");
+                            i = 0; // Сброс
+                            memset(field, 0, sizeof(field));
+                            continue; //  заново
+                        }
+                    }
+                    if (i == 0) { // Добавлена проверка на пустое поле
+                        printf("\nВы ничего не ввели. Повторите ввод.");
+                        printf("\nЕсли у вас нет данных для заполнения то введите 'нет данных'.");
+                        printf("\nИначе, введите необходимую информацию: \n");
+                        continue;
+                    }
+
+                    fprintf(file, "%s; ", field);
                     break;
                 }
-                break;
-
-            }
-            else if (c == '\r') {
-                if (!checkAndRequestEmpty(text[current_col], i, current_col, headers))
-                {
-                    if (i == 0 && c == 27)
-                    {
-                        if (file) fclose(file);
-                        return;
+                else if (c == 8) {
+                    if (i > 0) {
+                        i--;
+                        printf("\b \b");
+                        field[i] = '\0';
                     }
-                    //При нажатии на n, просим повторно ввести данные
-                    continue;
-                }
-
-                // Проверка *отдельных* полей и запрос "нет данных" - остаются
-
-                // *После* цикла, проверяющего отдельные поля:
-                bool allEmpty = true;
-                for (int j = 0; j < 3; ++j) {
-                    if (strlen(text[j]) > 0 && strcmp(text[j], "нет данных") != 0) {
-                        allEmpty = false;
-                        break;
-                    }
-                }
-
-                if (allEmpty) {
-                    printf("\nВсе поля пустые или содержат 'нет данных'. Запись не будет добавлена.\n");
-                    printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
                 }
                 else {
-                    // Добавленная проверка: все ли поля "нет данных"?
-                    bool allNoData = true;
-                    for (int j = 0; j < 3; j++) {
-                        if (strcmp(text[j], "нет данных") != 0) {
-                            allNoData = false; // Если хоть одно поле не "нет данных", то сбрасываем флаг
-                            break;
+                    // Ввод символов (с проверками)
+                    if (current_col == 1 && strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0)
+                    {
+                        // Разрешаем ввод букв (для "нет данных"), цифр, точек и пробелов.
+                        if (isdigit(c) || c == '.' || c == ' ' || (c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я')) {
+                            if (i < 999) {
+                                field[i++] = c;
+                                printf("%c", c);
+                            }
                         }
                     }
-                    if (!allNoData) //Добавил проверку
-                    {
-                        fprintf(file, "%s\t%s\t%s\n", text[0], text[1], text[2]); // Запись
+                    else if (current_col == 2 && strcmp(headers, "Название организации | Адрес | ФИО организатора\n") == 0) {
+                        //  буквы, пробел, дефис
+                        if ((c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') ||
+                            (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                            c == ' ' || c == '-') {
+                            if (i < 1000 - 1) {
+                                field[i++] = c;
+                                printf("%c", c);
+                            }
+                        }
                     }
                     else {
-                        printf("\nВсе поля пустые или содержат 'нет данных'. Запись не будет добавлена.\n");
-                        printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
-                    }
-
-                }
-
-                current_col = 0;
-                memset(text, 0, sizeof(text));
-                printf("\n");
-                break;
-            }
-            else if (c == 8) {
-                if (i > 0) {
-                    i--;
-                    printf("\b \b");
-                }
-            }
-            else {
-                // Непосредственно ввод символов
-                if (current_col == 1 && strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
-                    // Ввод даты: только цифры и точки
-                    if (isdigit(c) || c == '.') {
+                        // Для остальных полей - любой ввод
                         if (i < 1000 - 1) {
-                            text[current_col][i++] = c;
+                            field[i++] = c;
                             printf("%c", c);
                         }
-                    }
-                }
-                else if (current_col == 2 && strcmp(headers, "Название организации | Адрес | ФИО организатора\n") == 0) {
-                    // Ввод ФИО: буквы, пробел, дефис
-                    if ((c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') ||
-                        (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
-                        c == ' ' || c == '-') {
-                        if (i < 1000 - 1) {
-                            text[current_col][i++] = c;
-                            printf("%c", c);
-                        }
-                    }
-                }
-                else {
-                    // Для остальных полей (Тип корр., Название орг., Адрес) - любой ввод
-                    if (i < 1000 - 1) {
-                        text[current_col][i++] = c;
-                        printf("%c", c);
                     }
                 }
             }
         }
+        fprintf(file, "\n"); // Перенос строки после каждой тройки полей
+        printf("\n"); // Добавлен отступ после ввода строки
     }
 }
+
 
 /** @brief Работа с исходящей корреспонденцией. */
 void outgoing_correspondence() {
     char txt_name[256];
-    char text[3][1000];
     char full_name[512];
-    string mode = ""; //Для хранения данных о режиме
+    string mode = "";
 
     do {
         system("cls");
         SetConsoleCP(1251);
         SetConsoleOutputCP(1251);
         std::locale loc("ru_RU.UTF-8");
-        printf("Исходящая корреспонденция\n\n");
-        printf("1)   Создать/открыть файл для дозаписи\n");
-        printf("2)   Перезаписать файл\n");
-        printf("Esc) Выход в выбор типа файла\n\n");
+        printf("\nИсходящая корреспонденция:\n");
+        printf("1.   Создать/открыть файл для дозаписи\n");
+        printf("2.   Перезаписать файл\n");
+        printf("Esc. Выход в выбор типа файла\n\n");
         printf("_____________________________________________\n\n");
         char menu_out_case = _getch();
         if (menu_out_case == 27) {
@@ -399,7 +291,7 @@ void outgoing_correspondence() {
             }
 
             sprintf(full_name, "%s%s%s%s", folder_way, ocfe, txt_name, file_extension);
-            openFileForAppend(file, full_name, text, "Тип корреспонденции | Дата | Название организации\n", mode);
+            openFileForAppend(file, full_name, "Тип корреспонденции | Дата | Название организации\n", mode);
             break;
         }
 
@@ -437,11 +329,10 @@ void outgoing_correspondence() {
 
             file = fopen(full_name, "w");
             if (file) {
-                fprintf(file, "Тип корреспонденции | Дата | Название организации\n");
                 fclose(file);
                 printf("Файл успешно перезаписан.\n");
 
-                openFileForAppend(file, full_name, text, "Тип корреспонденции | Дата | Название организации\n", mode);
+                openFileForAppend(file, full_name, "Тип корреспонденции | Дата | Название организации\n", mode);
             }
             else {
                 printf("Ошибка перезаписи файла.\n");
@@ -461,7 +352,6 @@ void outgoing_correspondence() {
 /** @brief Работа с адресами организаций. */
 void organization_addresses() {
     char txt_name[256];
-    char text[3][1000];
     char full_name[512];
     string mode = "";
     SetConsoleCP(1251);
@@ -470,11 +360,12 @@ void organization_addresses() {
 
     do {
         system("cls");
-        printf("Адреса организаций\n\n");
-        printf("1)   Создать/открыть файл для дозаписи\n");
-        printf("2)   Перезаписать файл\n");
-        printf("Esc) Выход в выбор типа файла\n\n");
+        printf("\nАдреса организаций:\n");
+        printf("1.   Создать/открыть файл для дозаписи\n");
+        printf("2.   Перезаписать файл\n");
+        printf("Esc. Выход в выбор типа файла\n\n");
         printf("_____________________________________________\n\n");
+        printf("Текущий путь: %s\n\n", folder_way);
         char menu_out_case = _getch();
         if (menu_out_case == 27) {
             return;
@@ -497,7 +388,7 @@ void organization_addresses() {
             }
 
             sprintf(full_name, "%s%s%s%s", folder_way, oa, txt_name, file_extension);
-            openFileForAppend(file, full_name, text, "Название организации | Адрес | ФИО организатора\n", mode);
+            openFileForAppend(file, full_name, "Название организации | Адрес | ФИО организатора\n", mode);
             break;
         }
 
@@ -535,11 +426,10 @@ void organization_addresses() {
 
             file = fopen(full_name, "w");
             if (file) {
-                fprintf(file, "Название организации | Адрес | ФИО организатора\n");
                 fclose(file);
                 printf("Файл успешно перезаписан.\n");
 
-                openFileForAppend(file, full_name, text, "Название организации | Адрес | ФИО организатора\n", mode);
+                openFileForAppend(file, full_name, "Название организации | Адрес | ФИО организатора\n", mode);
             }
             else {
                 printf("Ошибка перезаписи файла.\n");
@@ -548,8 +438,6 @@ void organization_addresses() {
             break;
         }
         default:
-            printf("Некорректный ввод. Пожалуйста, выберите 1, 2 или Esc.\n");
-            printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
             break;
         }
     } while (true);
@@ -561,10 +449,10 @@ void menu_choises() {
     SetConsoleOutputCP(1251);
     do {
         system("cls");
-        printf("Меню выбора типа данных\n\n");
-        printf("1)   Исходящая корреспонденция\n");
-        printf("2)   Адреса организаций\n");
-        printf("Esc) Выход в меню\n");
+        printf("Меню выбора типа данных:\n");
+        printf("1.   Исходящая корреспонденция\n");
+        printf("2.   Адреса организаций\n");
+        printf("Esc. Выход в меню\n\n");
         printf("_____________________________________________\n\n");
         printf("Выбранный путь к папке: %s\n", folder_way);
 
@@ -585,10 +473,7 @@ void menu_choises() {
                 break;
             }
         default:
-            printf("Некорректный ввод. Пожалуйста выберите 1, 2, или Esc.\n");
-            printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
             break;
-
         }
     } while (true);
 }
@@ -646,11 +531,13 @@ void menu() {
     while (true) {
         system("cls");
         printf("Главное меню:\n");
-        printf("1. Начать работу\n");
-        printf("2. Изменить путь к папке\n");
-        printf("3. Инструкция\n\n");
+        printf("1.   Начать работу\n");
+        printf("2.   Изменить путь к папке\n");
+        printf("3.   Инструкция\n");
+        printf("Esc. Выход\n");
+        printf("_____________________________________________\n\n");
         printf("Текущий путь: %s\n\n", folder_way);
-        printf("Esc - выход\n\n");
+
 
         char menu_out = _getch();
         switch (menu_out) {
