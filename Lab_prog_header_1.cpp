@@ -2,25 +2,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable:4996)
 
-// #include <filesystem>  // Больше не используем C++ filesystem
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio.h>
-#include <ctype.h>
-#include <sys/stat.h>   // Для stat
-#include <direct.h>     // Для _mkdir (Windows) и _getcwd
-#include <Windows.h> // для SetConsoleCP, SetConsoleOutputCP
-#include <io.h> //Для _access
-
 // Глобальные переменные (определения)
 char folder_way[256] = { 0 };       // Путь к папке
-char last_valid_folder_way[256] = { 0 }; // Последний корректный путь
 const char* file_extension = ".txt";
 const char* ocfe = "IC_";
 const char* oa = "AO_";
 
 // Макрос для безопасного копирования строк (аналог strncpy, но с гарантированным добавлением \0)
+// (Описание макроса перенесено в заголовочный файл)
 #define SAFE_STRCPY(dest, src, size) do { strncpy(dest, src, size - 1); dest[size - 1] = '\0'; } while(0)
 
 // Функция для получения строки с консоли с обработкой Esc и Backspace
@@ -122,7 +111,7 @@ void instruction() {
     system("cls");
     system("mode con cols=150 lines=36");
 
-    FILE* file = fopen("instructions.txt", "r");
+    FILE* file = fopen("instruction.txt", "r");
     if (file) {
         char line[256]; // Буфер для чтения строки
         while (fgets(line, sizeof(line), file)) {
@@ -290,7 +279,7 @@ void outgoing_correspondence() {
         system("cls");
         SetConsoleCP(1251);
         SetConsoleOutputCP(1251);
-        printf("\nИсходящая корреспонденция:\n");
+        printf("Исходящая корреспонденция:\n");
         printf("1.   Создать/открыть файл для дозаписи\n");
         printf("2.   Перезаписать файл\n");
         printf("Esc. Выход в выбор типа файла\n\n");
@@ -380,7 +369,7 @@ void organization_addresses() {
         system("cls");
         SetConsoleCP(1251);
         SetConsoleOutputCP(1251);
-        printf("\nАдреса организаций:\n");
+        printf("Адреса организаций:\n");
         printf("1.   Создать/открыть файл для дозаписи\n");
         printf("2.   Перезаписать файл\n");
         printf("Esc. Выход в выбор типа файла\n\n");
@@ -558,10 +547,7 @@ void program_way() {
     printf("Введите путь к папке: ");
     getLineWithEsc("", folder_way_new, sizeof(folder_way_new));
     if (folder_way_new[0] == '\0') {
-        // Если введено пустое значение, используем последний корректный путь
-        if (last_valid_folder_way[0] != '\0') {
-            SAFE_STRCPY(folder_way, last_valid_folder_way, sizeof(folder_way));
-        }
+        // Если введено пустое значение, используем сохранённый путь в folder_way.
         return;
     }
 
@@ -571,18 +557,13 @@ void program_way() {
     if (stat(normalized_path, &program_way_buffer) == 0) {
         printf("Путь к папке выбран. ");
         snprintf(folder_way, sizeof(folder_way), "%s\\", normalized_path); // Добавляем завершающий слеш
-        // Сохраняем новый корректный путь
-        SAFE_STRCPY(last_valid_folder_way, folder_way, sizeof(last_valid_folder_way));
     }
     else {
         printf("Ошибка ввода. Неверный путь к папке. ");
-        // Используем последний корректный путь, если он есть
-        if (last_valid_folder_way[0] != '\0') {
-            SAFE_STRCPY(folder_way, last_valid_folder_way, sizeof(folder_way));
+        // Используем последний корректный путь, если он есть (который уже хранится в folder_way)
+        if (folder_way[0] != '\0')
+        {
             printf("Используется последний корректный путь: %s\n", folder_way);
-        }
-        else {
-            memset(folder_way, 0, sizeof(folder_way)); // Очищаем folder_way, если нет корректного
         }
     }
     printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
@@ -599,8 +580,6 @@ void menu() {
         if (_getcwd(current_path, sizeof(current_path)) != NULL)
         {
             snprintf(folder_way, sizeof(folder_way), "%s\\", current_path);
-            // Сохраняем как последний корректный
-            SAFE_STRCPY(last_valid_folder_way, folder_way, sizeof(last_valid_folder_way));
         }
         else
         {
@@ -629,7 +608,7 @@ void menu() {
                 break;
             }
             else {
-                printf("Сначала выберите путь к папке. ");
+                printf("Сначала выберите путь к папке. "); // На случай если программа не сможет определить путь
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
                 break;
             }
@@ -643,9 +622,8 @@ void menu() {
         case 27:
             return;
         default:
-            fprintf(stderr, "Неверный выбор.\n");
-            printf("Нажмите любую клавишу для продолжения...\n");
-            _getch();
+            // Убраны лишние вызовы
+            break;
         }
     }
 }
