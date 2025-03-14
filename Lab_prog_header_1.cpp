@@ -1,4 +1,4 @@
-#include "Lab_prog_header_1.h" // Óáåäèòåñü, ÷òî çàãîëîâî÷íûé ôàéë ñîâìåñòèì ñ C
+#include "Lab_prog_header_1.h"
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable:4996)
 
@@ -32,7 +32,7 @@ void getLineWithEsc(const char* instruction, char* buffer, int buffer_size) {
             if (i > 0) {
                 i--;
                 printf("\b \b");
-                buffer[i] = '\0'; // Âàæíî: îáíîâëÿåì áóôåğ!
+                buffer[i] = '\0'; // Îáíîâëÿåì áóôåğ
             }
         }
         else if (key >= 32 && key <= 255) { // Ğàñøèğåííûé äèàïàçîí äëÿ êèğèëëèöû
@@ -47,6 +47,7 @@ void getLineWithEsc(const char* instruction, char* buffer, int buffer_size) {
         }
     }
 }
+
 bool is_leap(int year) {
     return (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0));
 }
@@ -90,6 +91,7 @@ bool isValidDate(const char* dateStr) {
 
     return true;
 }
+
 bool isValidFileName(const char* fileName) {
     const char* invalidChars = "\\/:*?\"<>|"; // Çàïğåùåííûå ñèìâîëû
 
@@ -109,7 +111,7 @@ void instruction() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     system("cls");
-    system("mode con cols=150 lines=36");
+    //system("mode con cols=150 lines=36");
 
     FILE* file = fopen("instruction.txt", "r");
     if (file) {
@@ -133,7 +135,8 @@ void instruction() {
     }
     printf("\nÍàæìèòå ëşáóş êëàâèøó äëÿ ïğîäîëæåíèÿ...\n");
     _getch();
-    system("mode con cols=120 lines=30");
+    system("cls");
+    //system("mode con cols=120 lines=30");
 }
 
 void openFileForAppend(FILE*& file, const char* full_name, const char* headers, char* mode, size_t mode_size) {
@@ -266,9 +269,6 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
         printf("\n");
     }
 }
-
-
-
 
 void outgoing_correspondence() {
     char txt_name[256];
@@ -450,8 +450,6 @@ void organization_addresses() {
     } while (true);
 }
 
-
-
 void menu_choises() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -535,8 +533,6 @@ void normalizePath(const char* path, char* normalized_path, size_t normalized_pa
     SAFE_STRCPY(normalized_path, temp_path, normalized_path_size);
 }
 
-
-
 void program_way() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -550,7 +546,8 @@ void program_way() {
         // Åñëè ââåäåíî ïóñòîå çíà÷åíèå, èñïîëüçóåì ñîõğàí¸ííûé ïóòü â folder_way.
         return;
     }
-    if (folder_way_new[0] == 'ş') { //ıòî êîñòûëü ñâÿçàííûé ñ ./ ../ íî â ğóññêîé êëàâèàòåğå (ş. şş.)
+    unsigned char c = folder_way_new[0];
+    if ((c >= 192 && c <= 223) || (c >= 224 && c <= 255)) { // Íèêàêîé ïóòü íå íà÷èíàåòñÿ ñ ğóññêèõ ñèìâîëîâ
         // Åñëè ââåäåíî çàâåäîìî íåïğàâèëüíîå çíà÷åíèå, èñïîëüçóåì ñîõğàí¸ííûé ïóòü â folder_way.
         printf("Îøèáêà ââîäà. Íåâåğíûé ïóòü ê ïàïêå. ");
         printf("Èñïîëüçóåòñÿ ïîñëåäíèé êîğğåêòíûé ïóòü: %s\n", folder_way);
@@ -597,6 +594,13 @@ void menu() {
 
     while (true) {
         system("cls");
+
+        printf("*************************************************************\n");
+        printf("*    Ïğîãğàììà äëÿ âåäåíèÿ áàçû äàííûõ î êîğğåñïîíäåíöèè    *\n");
+        printf("*                 è àäğåñàõ îğãàíèçàöèé.                    *\n");
+        printf("*      Ïîçâîëÿåò äîáàâëÿòü, èçìåíÿòü è óäàëÿòü äàííûå.      *\n");
+        printf("*************************************************************\n");
+
         printf("Ãëàâíîå ìåíş:\n");
         printf("1.   Íà÷àòü ğàáîòó\n");
         printf("2.   Èçìåíèòü ïóòü ê ïàïêå\n");
