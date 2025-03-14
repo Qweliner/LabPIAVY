@@ -550,7 +550,13 @@ void program_way() {
         // Если введено пустое значение, используем сохранённый путь в folder_way.
         return;
     }
-
+    if (folder_way_new[0] == 'ю') { //это костыль связанный с ./ ../ но в русской клавиатере (ю. юю.)
+        // Если введено заведомо неправильное значение, используем сохранённый путь в folder_way.
+        printf("Ошибка ввода. Неверный путь к папке. ");
+        printf("Используется последний корректный путь: %s\n", folder_way);
+        printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
+        return;
+    }
     normalizePath(folder_way_new, normalized_path, sizeof(normalized_path));
 
     struct stat program_way_buffer;
