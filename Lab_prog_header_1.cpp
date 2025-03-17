@@ -8,8 +8,7 @@ const char* file_extension = ".txt";
 const char* ocfe = "IC_";
 const char* oa = "AO_";
 
-// Макрос для безопасного копирования строк (аналог strncpy, но с гарантированным добавлением \0)
-// (Описание макроса перенесено в заголовочный файл)
+// Макрос для безопасного копирования строк
 #define SAFE_STRCPY(dest, src, size) do { strncpy(dest, src, size - 1); dest[size - 1] = '\0'; } while(0)
 
 // Функция для получения строки с консоли с обработкой Esc и Backspace
@@ -48,26 +47,27 @@ void getLineWithEsc(const char* instruction, char* buffer, int buffer_size) {
     }
 }
 
+// Функция проверки года на високосность
 bool is_leap(int year) {
     return (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0));
 }
 
+// Функция проверки корректности даты
 bool isValidDate(const char* dateStr) {
     if (strcmp(dateStr, "нет данных") == 0) {
         return true;
     }
-    if (strlen(dateStr) != 10 && strcmp(dateStr, "нет данных") != 0) { // Добавил проверку и для "нет данных"
+    if (strlen(dateStr) != 10 && strcmp(dateStr, "нет данных") != 0) {
         return false;
     }
 
     int day, month, year;
-    //Убрал  %2d.%2d.%4d
     int count = sscanf(dateStr, "%d.%d.%d", &day, &month, &year);
 
-    if (count != 3 && strcmp(dateStr, "нет данных") != 0) { // Добавил проверку
+    if (count != 3 && strcmp(dateStr, "нет данных") != 0) {
         return false;
     }
-    if (strcmp(dateStr, "нет данных") == 0) //Добавил проверку
+    if (strcmp(dateStr, "нет данных") == 0)
     {
         return true;
     }
@@ -92,6 +92,7 @@ bool isValidDate(const char* dateStr) {
     return true;
 }
 
+// Функция проверки имени файла на недопустимые символы
 bool isValidFileName(const char* fileName) {
     const char* invalidChars = "\\/:*?\"<>|"; // Запрещенные символы
 
@@ -107,11 +108,11 @@ bool isValidFileName(const char* fileName) {
     return true; // Запрещенных символов нет
 }
 
+// Функция вывода инструкции
 void instruction() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     system("cls");
-    //system("mode con cols=150 lines=36");
 
     FILE* file = fopen("instruction.txt", "r");
     if (file) {
@@ -136,9 +137,9 @@ void instruction() {
     printf("\nНажмите любую клавишу для продолжения...\n");
     _getch();
     system("cls");
-    //system("mode con cols=120 lines=30");
 }
 
+// Функция открытия файла для дозаписи (или создания, если не существует)
 void openFileForAppend(FILE*& file, const char* full_name, const char* headers, char* mode, size_t mode_size) {
 
     if (_access(full_name, 0) == 0) {
@@ -155,8 +156,6 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
         system("PAUSE>nul");
         return;
     }
-    // Устанавливаем кодировку для записи в файл
-       // SetFileApisToANSI(); // Устарело и может вызывать проблемы. Лучше сохранять в UTF-8 без BOM
 
     system("cls");
     printf("Файл открыт для дозаписи.\n\n");
@@ -239,7 +238,7 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
                     // Ограничение ввода для ФИО (и для других полей - разрешаем всё)
                     if (current_col == 2 && strcmp(headers, "Название организации | Адрес | ФИО организатора\n") == 0)
                     {
-                        if (i < 999)  // проверка на переполнение буфера, должна быть всегда
+                        if (i < 999)  // проверка на переполнение буфера
                         {
                             if ((c >= 'а' && c <= 'я') || (c >= 'А' && c <= 'Я') ||
                                 (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
@@ -263,13 +262,14 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
                 }
             }
         }
-        // Запись в файл после ввода всех трех полей *и* перед переходом к следующей строке
+        // Запись в файл после ввода всех трех полей
         fprintf(file, "%s; %s; %s;\n", fields[0], fields[1], fields[2]);
         fflush(file); // Принудительная запись из буфера на диск
         printf("\n");
     }
 }
 
+// Функция для работы с исходящей корреспонденцией
 void outgoing_correspondence() {
     char txt_name[256];
     char full_name[512];
@@ -360,6 +360,7 @@ void outgoing_correspondence() {
     } while (true);
 }
 
+// Функция для работы с адресами организаций
 void organization_addresses() {
     char txt_name[256];
     char full_name[512];
@@ -450,6 +451,7 @@ void organization_addresses() {
     } while (true);
 }
 
+// Функция меню выбора типа данных
 void menu_choises() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -473,21 +475,33 @@ void menu_choises() {
                 outgoing_correspondence();
                 break;
             }
+            else {
+                printf("Сначала выберите путь к папке в главном меню (пункт 2).\n");
+                printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
+            }
+            break;
         case '2':
             if (folder_way[0] != '\0') {
                 organization_addresses();
                 break;
             }
+            else {
+                printf("Сначала выберите путь к папке в главном меню (пункт 2).\n");
+                printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
+            }
+            break;
+
         default:
             break;
         }
     } while (true);
 }
 
+// Функция нормализации пути
 void normalizePath(const char* path, char* normalized_path, size_t normalized_path_size) {
     char current_dir[256];
 
-    if (_getcwd(current_dir, sizeof(current_dir)) == NULL) {
+    if (getcwd(current_dir, sizeof(current_dir)) == NULL) {
         fprintf(stderr, "Ошибка получения текущего каталога.\n");
         normalized_path[0] = '\0';
         return;
@@ -499,31 +513,50 @@ void normalizePath(const char* path, char* normalized_path, size_t normalized_pa
     }
 
     // Абсолютный путь
-    if (isalpha(path[0]) && path[1] == ':' || path[0] == '\\' || path[0] == '/') {
-        SAFE_STRCPY(normalized_path, path, normalized_path_size);
+    if ((isalpha(path[0]) && path[1] == ':') || path[0] == '\\' || path[0] == '/') {
+        // Проверка на завершающий слеш во входном пути
+        size_t input_len = strlen(path);
+        if (input_len > 0 && (path[input_len - 1] == '\\' || path[input_len - 1] == '/')) {
+            char temp_path[256]; // Временная переменная
+            SAFE_STRCPY(temp_path, path, sizeof(temp_path));
+            temp_path[input_len - 1] = '\0';
+            SAFE_STRCPY(normalized_path, temp_path, normalized_path_size);
+        }
+        else {
+            SAFE_STRCPY(normalized_path, path, normalized_path_size);
+        }
         return;
     }
-
     // Относительный путь
     char temp_path[256] = { 0 };
     SAFE_STRCPY(temp_path, current_dir, sizeof(temp_path));
 
-    char* token = strtok((char*)path, "\\/"); //  const char* на char*
+    char* token = strtok((char*)path, "\\/");
     while (token != NULL) {
         if (strcmp(token, ".") == 0) {
-            // Текущая директория - пропускаем
+            // Текущая директория
         }
         else if (strcmp(token, "..") == 0) {
-            // Поднимаемся на уровень вверх
+            // Вверх по иерархии
             char* last_sep = strrchr(temp_path, '\\');
+            if (last_sep == nullptr) {
+                last_sep = strrchr(temp_path, '/');
+            }
             if (last_sep != NULL) {
-                *last_sep = '\0'; // Удаляем последний компонент пути
+                *last_sep = '\0';
             }
         }
         else {
-            // Добавляем компонент к пути
-            if (strlen(temp_path) > 0 && temp_path[strlen(temp_path) - 1] != '\\') {
-                strncat(temp_path, "\\", sizeof(temp_path) - strlen(temp_path) - 1);
+            // Добавление компонента
+            size_t len = strlen(temp_path);
+            if (len > 0 && temp_path[len - 1] != '\\' && temp_path[len - 1] != '/') {
+                strncat(temp_path,
+#ifdef _WIN32
+                    "\\",
+#else
+                    "/",
+#endif
+                    sizeof(temp_path) - len - 1);
             }
             strncat(temp_path, token, sizeof(temp_path) - strlen(temp_path) - 1);
         }
@@ -533,6 +566,7 @@ void normalizePath(const char* path, char* normalized_path, size_t normalized_pa
     SAFE_STRCPY(normalized_path, temp_path, normalized_path_size);
 }
 
+// Функция выбора пути к папке
 void program_way() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -543,12 +577,10 @@ void program_way() {
     printf("Введите путь к папке: ");
     getLineWithEsc("", folder_way_new, sizeof(folder_way_new));
     if (folder_way_new[0] == '\0') {
-        // Если введено пустое значение, используем сохранённый путь в folder_way.
         return;
     }
     unsigned char c = folder_way_new[0];
-    if ((c >= 192 && c <= 223) || (c >= 224 && c <= 255)) { // Никакой путь не начинается с русских символов
-        // Если введено заведомо неправильное значение, используем сохранённый путь в folder_way.
+    if ((c >= 192 && c <= 223) || (c >= 224 && c <= 255)) {
         printf("Ошибка ввода. Неверный путь к папке. ");
         printf("Используется последний корректный путь: %s\n", folder_way);
         printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
@@ -558,21 +590,33 @@ void program_way() {
 
     struct stat program_way_buffer;
     if (stat(normalized_path, &program_way_buffer) == 0) {
-        printf("Путь к папке выбран. ");
-        snprintf(folder_way, sizeof(folder_way), "%s\\", normalized_path); // Добавляем завершающий слеш
+        char test_file_path[512];
+        snprintf(test_file_path, sizeof(test_file_path), "%s\\test_access.txt", normalized_path);
+        FILE* test_file = fopen(test_file_path, "w");
+
+        if (test_file) {
+            fclose(test_file);
+            remove(test_file_path);
+            printf("Путь к папке выбран.\n");
+            snprintf(folder_way, sizeof(folder_way), "%s\\", normalized_path); // Завершающий слеш НУЖЕН
+        }
+        else {
+            printf("Ошибка: Нет прав для записи в указанную папку.\n");
+            if (folder_way[0] != '\0') {
+                printf("Используется последний корректный путь: %s\n", folder_way);
+            }
+        }
     }
     else {
-        printf("Ошибка ввода. Неверный путь к папке. ");
-        // Используем последний корректный путь, если он есть (который уже хранится в folder_way)
-        if (folder_way[0] != '\0')
-        {
+        printf("Ошибка ввода. Неверный путь к папке.\n");
+        if (folder_way[0] != '\0') {
             printf("Используется последний корректный путь: %s\n", folder_way);
         }
     }
     printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
 }
 
-
+// Главное меню программы
 void menu() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
@@ -586,7 +630,7 @@ void menu() {
         }
         else
         {
-            fprintf(stderr, "Ошибка при получении текущего пути.\n"); //  обработка ошибки
+            fprintf(stderr, "Ошибка при получении текущего пути.\n"); // обработка ошибки
         }
     }
 
@@ -618,7 +662,7 @@ void menu() {
                 break;
             }
             else {
-                printf("Сначала выберите путь к папке. "); // На случай если программа не сможет определить путь
+                printf("Сначала выберите путь к папке. ");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
                 break;
             }
@@ -632,7 +676,6 @@ void menu() {
         case 27:
             return;
         default:
-            // Убраны лишние вызовы
             break;
         }
     }
