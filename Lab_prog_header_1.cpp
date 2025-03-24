@@ -1,3 +1,4 @@
+//Lab_prog_header_1.cpp
 #include "Lab_prog_header_1.h"
 #define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable:4996)
@@ -174,27 +175,27 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
             memset(fields[current_col], 0, sizeof(fields[current_col]));
 
             if (current_col == 0) {
-                if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
-                    printf("\nТип корреспонденции: ");
+                if (strcmp(headers, "Вид корреспонденции | Дата подготовки | Название организации\n") == 0) {
+                    printf("\nВид корреспонденции: ");
                 }
                 else {
                     printf("\nНазвание организации: ");
                 }
             }
             else if (current_col == 1) {
-                if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
-                    printf("\nДата (ДД.ММ.ГГГГ): ");
+                if (strcmp(headers, "Вид корреспонденции | Дата подготовки | Название организации\n") == 0) {
+                    printf("\nДата подготовки (ДД.ММ.ГГГГ): ");
                 }
                 else {
                     printf("\nАдрес: ");
                 }
             }
             else if (current_col == 2) {
-                if (strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
+                if (strcmp(headers, "Вид корреспонденции | Дата подготовки | Название организации\n") == 0) {
                     printf("\nНазвание организации: ");
                 }
                 else {
-                    printf("\nФИО организатора: ");
+                    printf("\nФамилия руководителя: ");
                 }
             }
 
@@ -208,7 +209,7 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
                 else if (c == '\t' || c == '\r') {
                     fields[current_col][i] = '\0';
 
-                    if (current_col == 1 && strcmp(headers, "Тип корреспонденции | Дата | Название организации\n") == 0) {
+                    if (current_col == 1 && strcmp(headers, "Вид корреспонденции | Дата подготовки | Название организации\n") == 0) {
                         if (!isValidDate(fields[current_col])) {
                             printf("\nНеверный формат даты. Пожалуйста, введите дату в формате ДД.ММ.ГГГГ или 'нет данных': \n");
                             i = 0;
@@ -235,8 +236,8 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
                     }
                 }
                 else {
-                    // Ограничение ввода для ФИО (и для других полей - разрешаем всё)
-                    if (current_col == 2 && strcmp(headers, "Название организации | Адрес | ФИО организатора\n") == 0)
+                    // Ограничение ввода для Фамилия руководителя (и для других полей - разрешаем всё)
+                    if (current_col == 2 && strcmp(headers, "Название организации | Адрес | Фамилия руководителя\n") == 0)
                     {
                         if (i < 999)  // проверка на переполнение буфера
                         {
@@ -306,7 +307,7 @@ void outgoing_correspondence() {
             }
 
             snprintf(full_name, sizeof(full_name), "%s%s%s%s", folder_way, ocfe, txt_name, file_extension);
-            openFileForAppend(file, full_name, "Тип корреспонденции | Дата | Название организации\n", mode, sizeof(mode));
+            openFileForAppend(file, full_name, "Вид корреспонденции | Дата подготовки | Название организации\n", mode, sizeof(mode));
             break;
         }
         case '2': {
@@ -344,7 +345,7 @@ void outgoing_correspondence() {
             if (file) {
                 fclose(file);
                 printf("Файл успешно перезаписан.\n");
-                openFileForAppend(file, full_name, "Тип корреспонденции | Дата | Название организации\n", mode, sizeof(mode));
+                openFileForAppend(file, full_name, "Вид корреспонденции | Дата подготовки | Название организации\n", mode, sizeof(mode));
             }
             else {
                 printf("Ошибка перезаписи файла.\n");
@@ -398,7 +399,7 @@ void organization_addresses() {
             }
 
             snprintf(full_name, sizeof(full_name), "%s%s%s%s", folder_way, oa, txt_name, file_extension);
-            openFileForAppend(file, full_name, "Название организации | Адрес | ФИО организатора\n", mode, sizeof(mode));
+            openFileForAppend(file, full_name, "Название организации | Адрес | Фамилия руководителя\n", mode, sizeof(mode));
             break;
         }
         case '2': {
@@ -436,7 +437,7 @@ void organization_addresses() {
             if (file) {
                 fclose(file);
                 printf("Файл успешно перезаписан.\n");
-                openFileForAppend(file, full_name, "Название организации | Адрес | ФИО организатора\n", mode, sizeof(mode));
+                openFileForAppend(file, full_name, "Название организации | Адрес | Фамилия руководителя\n", mode, sizeof(mode));
             }
             else {
                 printf("Ошибка перезаписи файла.\n");
