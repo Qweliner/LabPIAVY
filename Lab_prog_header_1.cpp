@@ -123,13 +123,13 @@ bool isValidDate(const char* dateStr) {
 
 // Функция проверки имени файла на недопустимые символы
 bool isValidFileName(const char* fileName) {
-    const char* invalidChars = "\\/:*?\"<>|"; // Запрещенные символы
+    const char* invalidChars = "\\/:*?\"<>|";
 
     // Проверяем
     for (int i = 0; fileName[i] != '\0'; ++i) {
         for (int j = 0; invalidChars[j] != '\0'; ++j) {
             if (fileName[i] == invalidChars[j]) {
-                return false; // Найден запрещенный символ
+                return false;
             }
         }
     }
@@ -152,15 +152,14 @@ void instruction() {
         fclose(file);
     }
     else {
-        printf("Не удалось открыть файл instruction.txt\n");
-        printf("Пожалуйста, поместите файл instruction.txt в следующую папку:\n");
+        printf("Не удалось открыть файл с инструкцией. Убедитесь, что файл 'instruction.txt' находится в той же папке, что и программа.\n");
         char current_path[256];
         if (_getcwd(current_path, sizeof(current_path)) != NULL) {
             printf("%s\n", current_path);
         }
         else
         {
-            printf("Ошибка при получении текущего пути.\n");
+            printf("Не удалось определить текущую папку.\n");
         }
     }
     printf("\nНажмите любую клавишу для продолжения...\n");
@@ -180,7 +179,7 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
 
     file = fopen(full_name, "a");
     if (!file) {
-        printf("Ошибка открытия файла.\n");
+        printf("Не удалось открыть файл для записи. Возможно, файл занят другой программой, или у вас нет прав доступа.\n");
         printf("Для продолжения нажмите Enter.");
         system("PAUSE>nul");
         return;
@@ -239,7 +238,7 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
 
                     if (current_col == 1 && strcmp(headers, "Вид корреспонденции | Дата подготовки | Название организации\n") == 0) {
                         if (!isValidDate(fields[current_col])) {
-                            printf("\nНеверный формат даты. Введите дату в формате ДД.ММ.ГГГГ или 'нет данных': \n");
+                            printf("\nНеправильный формат даты. Введите дату в формате 'ДД.ММ.ГГГГ' (например, 01.01.2023) или введите 'нет данных'.\n");
                             i = 0;
                             memset(fields[current_col], 0, sizeof(fields[current_col]));
                             continue;
@@ -248,9 +247,7 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers, 
 
                     if (i == 0 && strcmp(fields[current_col], "нет данных") != 0)
                     {
-                        printf("\nВы ничего не ввели. Повторите ввод.");
-                        printf("\nЕсли нет данных введите 'нет данных'.");
-                        printf("\nИначе, введите информацию: \n");
+                        printf("\nВы не ввели никаких данных. Пожалуйста, введите информацию или укажите 'нет данных'.\n");
                         continue;
                     }
                     break;
@@ -334,7 +331,7 @@ void outgoing_correspondence() {
             }
 
             if (!isValidFileName(txt_name)) {
-                printf("Недопустимые символы в имени файла.\n");
+                printf("Недопустимые символы в имени файла. Используйте только буквы, цифры, пробелы и знаки препинания.\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
                 break;
             }
@@ -352,7 +349,7 @@ void outgoing_correspondence() {
                 break;
             }
             if (!isValidFileName(txt_name)) {
-                printf("Недопустимые символы в имени файла.\n");
+                printf("Недопустимые символы в имени файла. Используйте только буквы, цифры, пробелы и знаки препинания.\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
                 break;
             }
@@ -381,7 +378,7 @@ void outgoing_correspondence() {
                 openFileForAppend(file, full_name, "Вид корреспонденции | Дата подготовки | Название организации\n", mode, sizeof(mode));
             }
             else {
-                printf("Ошибка перезаписи файла.\n");
+                printf("Ошибка открытия файла для записи. Возможно, файл занят другой программой, или у вас нет прав доступа.\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
             }
             break;
@@ -405,7 +402,7 @@ void organization_addresses() {
         SetConsoleCP(1251);
         SetConsoleOutputCP(1251);
         printf("Адреса организаций:\n");
-        printf("1.  Создать/открыть файл\n");
+        printf("1.  Создать/открыть файл для дозаписи\n");
         printf("2.  Перезаписать файл\n");
         printf("Esc. Выход\n");
         printf("_____________________________________________\n\n");
@@ -426,7 +423,7 @@ void organization_addresses() {
             }
 
             if (!isValidFileName(txt_name)) {
-                printf("Недопустимые символы в имени файла. \n");
+                printf("Недопустимые символы в имени файла. Используйте только буквы, цифры, пробелы и знаки препинания.\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
                 break;
             }
@@ -444,7 +441,7 @@ void organization_addresses() {
             }
 
             if (!isValidFileName(txt_name)) {
-                printf("Недопустимые символы в имени файла.\n");
+                printf("Недопустимые символы в имени файла. Используйте только буквы, цифры, пробелы и знаки препинания.\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
                 break;
             }
@@ -473,7 +470,7 @@ void organization_addresses() {
                 openFileForAppend(file, full_name, "Название организации | Адрес | Фамилия руководителя\n", mode, sizeof(mode));
             }
             else {
-                printf("Ошибка перезаписи файла.\n");
+                printf("Ошибка открытия файла для записи. Возможно, файл занят другой программой, или у вас нет прав доступа.\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
             }
             break;
@@ -510,7 +507,7 @@ void menu_choises() {
                 break;
             }
             else {
-                printf("Сначала выберите путь к папке (пункт 2).\n");
+                printf("Сначала выберите путь (пункт 2).\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
             }
             break;
@@ -520,7 +517,7 @@ void menu_choises() {
                 break;
             }
             else {
-                printf("Сначала выберите путь к папке (пункт 2).\n");
+                printf("Сначала выберите путь (пункт 2).\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
             }
             break;
@@ -536,7 +533,7 @@ void normalizePath(const char* path, char* normalized_path, size_t normalized_pa
     char current_dir[256];
 
     if (_getcwd(current_dir, sizeof(current_dir)) == NULL) {
-        fprintf(stderr, "Ошибка получения текущего каталога.\n");
+        fprintf(stderr, "Не удалось определить текущую папку.\n");
         normalized_path[0] = '\0';
         return;
     }
@@ -609,7 +606,7 @@ void program_way() {
     }
     unsigned char c = folder_way_new[0];
     if ((c >= 192 && c <= 223) || (c >= 224 && c <= 255)) {
-        printf("Ошибка ввода. Неверный путь. ");
+        printf("Ошибка ввода. Неверный путь. \n");
         printf("Используется последний корректный путь: %s\n", folder_way);
         printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
         return;
@@ -638,14 +635,14 @@ void program_way() {
 
         }
         else {
-            printf("Ошибка: Нет прав для записи.\n");
+            printf("Нет прав для доступа к указанной папке. Выберите другую папку или обратитесь к администратору.\n");
             if (folder_way[0] != '\0') {
                 printf("Используется последний корректный путь: %s\n", folder_way);
             }
         }
     }
     else {
-        printf("Ошибка ввода. Неверный путь.\n");
+        printf("Указанный путь не существует. Проверьте правильность написания и убедитесь, что папка существует.\n");
         if (folder_way[0] != '\0') {
             printf("Используется последний корректный путь: %s\n", folder_way);
         }
@@ -667,7 +664,7 @@ void menu() {
         }
         else
         {
-            fprintf(stderr, "Ошибка при получении текущего пути.\n");
+            printf("Не удалось определить текущую папку.\n");
         }
     }
 
@@ -699,7 +696,7 @@ void menu() {
                 break;
             }
             else {
-                printf("Сначала выберите путь. ");
+                printf("Сначала выберите путь (пункт 2).\n");
                 printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
                 break;
             }
