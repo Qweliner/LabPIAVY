@@ -182,7 +182,7 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers) 
     system("cls");
     if (ftell(file) == 0) { // Проверяем, пустой ли файл (был только что создан)
         printf("Файл '%s' создан.\n\n", full_name);
-        fprintf(file, "%s", headers); // Записываем заголовки, если файл новый
+        //fprintf(file, "%s", headers); // Записываем заголовки, если файл новый
         fflush(file);
     }
     else {

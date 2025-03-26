@@ -1,3 +1,4 @@
+//Lab_prog_header_1.h
 #pragma once
 
 #include <stdio.h>   // ¬вод-вывод: printf, fprintf, fopen, fclose, fgets, sscanf, snprintf
