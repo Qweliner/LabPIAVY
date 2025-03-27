@@ -9,9 +9,6 @@ const char* file_extension = ".txt";
 const char* ocfe = "IC_";
 const char* oa = "AO_";
 
-// Макрос для безопасного копирования строк
-// Перенесен в .h
-
 // Функция проверки символа для имени файла
 bool isValidFileNameChar(char c) {
     unsigned char uc = (unsigned char)c; // Для корректной работы с кириллицей
@@ -88,7 +85,6 @@ void getLineWithRestrictedChars(const char* instruction, char* buffer, int buffe
         }
     }
 }
-
 
 // Функция проверки года на високосность
 bool is_leap(int year) {
