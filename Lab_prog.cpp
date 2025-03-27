@@ -7,9 +7,6 @@ int main()
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
-    // Устанавливаем изначальный размер окна консольного приложения
-    system("mode con cols=120 lines=30");
-
     // Вызываем главную функцию меню
     menu();
 

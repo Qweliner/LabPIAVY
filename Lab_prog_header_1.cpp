@@ -139,8 +139,6 @@ bool isValidDate(const char* dateStr) {
 
 // Функция вывода инструкции
 void instruction() {
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
     system("cls");
 
     FILE* file = fopen("instruction.txt", "r");
@@ -367,7 +365,6 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers) 
         }
     }
 }
-
 
 // Функция для работы с исходящей корреспонденцией
 void outgoing_correspondence() {
@@ -625,7 +622,6 @@ void normalizePath(const char* path, char* normalized_path, size_t normalized_pa
     }
 }
 
-
 // Функция выбора пути к папке
 void program_way() {
     SetConsoleCP(1251);
@@ -694,7 +690,6 @@ void program_way() {
 
     printf("Для продолжения нажмите Enter."); system("PAUSE>nul");
 }
-
 
 // Главное меню программы
 void menu() {
