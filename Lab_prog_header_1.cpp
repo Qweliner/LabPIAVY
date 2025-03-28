@@ -117,7 +117,7 @@ bool isValidDate(const char* dateStr) {
     }
 
     // Проверка корректности значений дня, месяца, года
-    if (year < 1 || year > 9999 || month < 1 || month > 12 || day < 1) {
+    if (year < 0 || month < 1 || month > 12 || day < 1) {
         return false; // Неправильная дата
     }
 
@@ -176,7 +176,6 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers) 
     system("cls");
     if (ftell(file) == 0) { // Проверяем, пустой ли файл (был только что создан)
         printf("Файл '%s' создан.\n\n", full_name);
-        //fprintf(file, "%s", headers); // Записываем заголовки, если файл новый
         fflush(file);
     }
     else {
@@ -221,34 +220,35 @@ void openFileForAppend(FILE*& file, const char* full_name, const char* headers) 
                         continue;
                     }
                 }
-                // Определяем, разрешен ли символ ДЛЯ ТЕКУЩЕГО ПОЛЯ
+                // Определяем, разрешен ли символ для текущего поля
                 unsigned char uc = (unsigned char)c; // Для корректной работы с кириллицей
-                bool is_letter = (uc >= 'A' && uc <= 'Z') || (uc >= 'a' && uc <= 'z') || (uc >= 192); // Латиница + Кириллица (грубо)
+                bool is_letter_ru = (uc >= 'А' && uc <= 'Я') || (uc >= 'а' && uc <= 'я') || (uc >= 192); // Кириллица
+                bool is_letter_en = (uc >= 'a' && uc <= 'z') || (uc >= 'A' && uc <= 'Z'); // Латиница
                 bool is_digit = (uc >= '0' && uc <= '9');
                 bool is_space = (uc == ' ');
 
                 if (current_col == 0) { // Вид корреспонденции / Название организации (первое поле)
                     if (strcmp(headers, "Вид корреспонденции; Дата подготовки; Название организации;\n") == 0) { // Вид корреспонденции
-                        allowed = is_letter || is_digit || is_space || uc == '-' || uc == '_' || uc == '.' || uc == ',' || uc == '(' || uc == ')';
+                        allowed = is_letter_ru || is_letter_en || is_digit || is_space || uc == '-' || uc == '_' || uc == '.' || uc == ',' || uc == '(' || uc == ')' || uc == 211;
                     }
                     else { // Название организации (из адресов)
-                        allowed = is_letter || is_digit || is_space || uc == '-' || uc == '_' || uc == '.' || uc == ',' || uc == '"' || uc == '(' || uc == ')' || uc == 211 || uc == '+' || uc == '!' || uc == '&' || uc == ':' || uc == 171 || uc == 187 || uc == '#'; // №(211), «(171), »(187)
+                        allowed = is_letter_ru || is_letter_en || is_digit || is_space || uc == '-' || uc == '_' || uc == '.' || uc == ',' || uc == '"' || uc == '(' || uc == ')' || uc == 211 || uc == '+' || uc == '!' || uc == '&' || uc == ':' || uc == 171 || uc == 187 || uc == '#'; // №(211), «(171), »(187)
                     }
                 }
                 else if (current_col == 1) { // Дата подготовки / Адрес
                     if (strcmp(headers, "Вид корреспонденции; Дата подготовки; Название организации;\n") == 0) { // Дата подготовки
-                        allowed = is_digit || uc == '.' || is_letter || is_space; // Разрешаем буквы и пробел для "нет данных"
+                        allowed = is_digit || uc == '.' || is_letter_ru || is_space; // Разрешаем буквы и пробел для "нет данных"
                     }
                     else { // Адрес
-                        allowed = is_letter || is_digit || is_space || uc == '-' || uc == ',' || uc == '.' || uc == '/' || uc == 211; // №(211)
+                        allowed = is_letter_ru || is_letter_en || is_digit || is_space || uc == '-' || uc == ',' || uc == '.' || uc == '/' || uc == 211; // №(211)
                     }
                 }
                 else if (current_col == 2) { // Название организации / Фамилия руководителя
                     if (strcmp(headers, "Вид корреспонденции; Дата подготовки; Название организации;\n") == 0) { // Название организации (из корреспонденции)
-                        allowed = is_letter || is_digit || is_space || uc == '-' || uc == '_' || uc == '.' || uc == ',' || uc == '"' || uc == '(' || uc == ')' || uc == 211 || uc == '+' || uc == '!' || uc == '&' || uc == ':' || uc == 171 || uc == 187 || uc == '#'; // №(211), «(171), »(187)
+                        allowed = is_letter_ru || is_letter_en || is_digit || is_space || uc == '-' || uc == '_' || uc == '.' || uc == ',' || uc == '"' || uc == '(' || uc == ')' || uc == 211 || uc == '+' || uc == '!' || uc == '&' || uc == ':' || uc == 171 || uc == 187 || uc == '#'; // №(211), «(171), »(187)
                     }
                     else { // Фамилия руководителя
-                        allowed = is_letter || uc == '-' || is_space;
+                        allowed = is_letter_ru || is_letter_en || uc == '-' || is_space;
                     }
                 }
 
@@ -376,7 +376,7 @@ void outgoing_correspondence() {
         printf("2.   Перезаписать файл\n");
         printf("Esc. Выход в выбор типа файла\n\n");
         printf("_____________________________________________\n\n");
-        printf("Текущий путь: %s\n\n", folder_way);
+        printf("Выбранный путь к папке: %s\n\n", folder_way);
 
         char menu_out_case = _getch();
         if (menu_out_case == 27) {
@@ -420,7 +420,7 @@ void outgoing_correspondence() {
 
             bool exists = (_access(full_name, 0) == 0);
             if (exists) {
-                printf("Файл с таким именем уже существует. Перезаписать? (y/n): ");
+                printf("Файл с таким именем найден. Перезаписать? (y/n): ");
                 char overwriteConfirm = _getch();
                 printf("\n"); // Перевод строки после _getch
                 if (tolower(overwriteConfirm) != 'y') {
@@ -434,7 +434,6 @@ void outgoing_correspondence() {
             if (file) {
                 fclose(file); // Закрываем, чтобы openFileForAppend мог открыть в "a"
                 printf("Файл '%s' успешно %s.\n", full_name, exists ? "перезаписан" : "создан");
-                // Открываем для добавления данных (заголовки добавятся автоматически)
                 openFileForAppend(file, full_name, "Вид корреспонденции; Дата подготовки; Название организации;\n");
             }
             else {
@@ -464,7 +463,7 @@ void organization_addresses() {
         printf("2.   Перезаписать файл\n");
         printf("Esc. Выход в выбор типа файла\n\n");
         printf("_____________________________________________\n\n");
-        printf("Текущий путь: %s\n\n", folder_way);
+        printf("Выбранный путь к папке: %s\n\n", folder_way);
         char menu_out_case = _getch();
         if (menu_out_case == 27) {
             return;
@@ -504,7 +503,7 @@ void organization_addresses() {
 
             bool exists = (_access(full_name, 0) == 0);
             if (exists) {
-                printf("Файл с таким именем уже существует. Перезаписать? (y/n): ");
+                printf("Файл с таким именем найден. Перезаписать? (y/n): ");
                 char overwriteConfirm = _getch();
                 printf("\n");
                 if (tolower(overwriteConfirm) != 'y') {
@@ -752,7 +751,6 @@ void menu() {
         case 27: // ESC
             return;
         default:
-            // Игнорируем неверный ввод в меню
             break;
         }
     }
